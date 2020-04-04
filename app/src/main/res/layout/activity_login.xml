@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    tools:context=".LoginActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/TextViewStyle"
+        android:layout_marginTop="-70dp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/loginTextLabel">
+    </TextView>
+
+    <EditText
+        android:id="@+id/user"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        style="@style/EditTextStyle"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp"
+        android:hint="@string/user"
+        android:ems="10"
+        android:inputType="text">
+    </EditText>
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        style="@style/EditTextStyle"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:hint="@string/password"
+        android:ems="10"
+        android:inputType="textPassword">
+    </EditText>
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        style="@style/ButtonStyle"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/loginLabel">
+    </Button>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/TextViewStyle"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="70dp"
+        android:text="@string/RegisterTextLabel">
+    </TextView>
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        style="@style/ButtonStyle"
+        android:layout_marginTop="25dp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/RegisterLabel">
+    </Button>
+
+</LinearLayout>

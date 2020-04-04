@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">RouteMap</string>
+    <string name="app_name">Route Map</string>
+
+    <!-- Login layout -->
+    <string name="loginTextLabel">Accede a tu cuenta</string>
+    <string name="user">Usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="title">Route Map</string>
+    <string name="description">Route Map se trata de una aplicación que te permitira buscar el camino más optimo para desplazarte a los lugares que necesites.</string>
+    <string name="loginLabel">Iniciar sesion</string>
+    <string name="RegisterTextLabel">¿Todavia no tienes una cuenta?</string>
+    <string name="RegisterLabel">Registrarse</string>
 </resources>
