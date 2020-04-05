@@ -7,16 +7,28 @@
     android:orientation="vertical"
     android:gravity="center_vertical"
     android:background="@android:color/holo_blue_bright"
-    tools:context=".LoginActivity">
+    tools:context=".RegisterActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/TextViewStyle"
         android:layout_marginTop="-70dp"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/loginTextLabel">
+        android:gravity="center_horizontal"
+        android:text="@string/registerDescription">
     </TextView>
+
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        style="@style/EditTextStyle"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:hint="@string/email"
+        android:ems="10"
+        android:inputType="textEmailAddress">
+    </EditText>
 
     <EditText
         android:id="@+id/user"
@@ -24,7 +36,7 @@
         android:layout_height="40dp"
         style="@style/EditTextStyle"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="20dp"
         android:hint="@string/user"
         android:ems="10"
         android:inputType="text">
@@ -37,29 +49,22 @@
         style="@style/EditTextStyle"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
         android:hint="@string/password"
         android:ems="10"
         android:inputType="textPassword">
     </EditText>
 
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="180dp"
-        android:layout_height="wrap_content"
-        style="@style/ButtonStyle"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/loginLabel">
-    </Button>
-
-    <TextView
+    <EditText
+        android:id="@+id/password2"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/TextViewStyle"
+        android:layout_height="40dp"
+        style="@style/EditTextStyle"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="70dp"
-        android:text="@string/registerTextLabel">
-    </TextView>
+        android:layout_marginTop="20dp"
+        android:hint="@string/password2"
+        android:ems="10"
+        android:inputType="textPassword">
+    </EditText>
 
     <Button
         android:id="@+id/registerButton"
@@ -68,7 +73,7 @@
         style="@style/ButtonStyle"
         android:layout_marginTop="25dp"
         android:layout_gravity="center_horizontal"
-        android:text="@string/registerLabel">
+        android:text="@string/enviar">
     </Button>
 
 </LinearLayout>
