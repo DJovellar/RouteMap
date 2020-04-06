@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center_vertical"
     android:background="@android:color/holo_blue_bright"
-    tools:context=".RegisterActivity">
+    tools:context=".activities.RegisterActivity">
 
     <TextView
         android:layout_width="wrap_content"
@@ -19,7 +19,7 @@
     </TextView>
 
     <EditText
-        android:id="@+id/email"
+        android:id="@+id/registerEmail"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         style="@style/EditTextStyle"
@@ -31,7 +31,7 @@
     </EditText>
 
     <EditText
-        android:id="@+id/user"
+        android:id="@+id/registerUser"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         style="@style/EditTextStyle"
@@ -43,7 +43,7 @@
     </EditText>
 
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/registerPassword"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         style="@style/EditTextStyle"
@@ -55,7 +55,7 @@
     </EditText>
 
     <EditText
-        android:id="@+id/password2"
+        android:id="@+id/registerPassword2"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         style="@style/EditTextStyle"
@@ -67,7 +67,7 @@
     </EditText>
 
     <Button
-        android:id="@+id/registerButton"
+        android:id="@+id/sendRegisterButton"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
         style="@style/ButtonStyle"
