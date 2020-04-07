@@ -30,4 +30,9 @@
         <item name="android:background">@drawable/button_custom</item>
     </style>
 
+    <style name="ButtonMapStyle" parent="android:Widget.Button">
+        <item name="android:background">@drawable/button_map_custom</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
 </resources>

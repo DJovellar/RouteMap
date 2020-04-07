@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.routemap.MapActivity;
 import com.example.routemap.R;
 import com.example.routemap.domain.User;
 
@@ -48,6 +49,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 if(check_login(user.getText().toString(), password.getText().toString())) {
                     Toast.makeText(this, "Sesion iniciada correctamente", Toast.LENGTH_SHORT).show();
+                    Intent in = new Intent(this, MapActivity.class);
+                    startActivity(in);
                 }else {
                     user.setText("");
                     password.setText("");
