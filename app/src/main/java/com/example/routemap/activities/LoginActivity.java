@@ -1,15 +1,16 @@
 package com.example.routemap.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.routemap.MapActivity;
 import com.example.routemap.R;
 import com.example.routemap.domain.User;
 
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private Toolbar toolbar;
 
     private List<User> registredUsers;
 
@@ -27,6 +30,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         //3ª Entrega: Obtener lista de usuarios registrados de la Base de Datos
         registredUsers = new ArrayList<>();
@@ -74,7 +80,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         return false;
     }
 
-
-
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu_login_register, menu);
+        return true;
+    }
 }

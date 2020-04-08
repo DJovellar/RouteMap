@@ -15,7 +15,7 @@
     <string name="enviar">Enviar</string>
     <string name="registerDescription">Rellene los siguientes campos para completar el registro de su cuenta</string>
 
-    <!-- Map layout -->
+    <!-- Toolbar buttons -->
     <string name="add">Añadir</string>
     <string name="filter">Filtrar</string>
     <string name="help">Ayuda</string>
