@@ -19,5 +19,7 @@
     <string name="add">Añadir</string>
     <string name="filter">Filtrar</string>
     <string name="help">Ayuda</string>
+    <string name="profile">Perfil</string>
+    <string name="preferences">Preferencias</string>
 
 </resources>

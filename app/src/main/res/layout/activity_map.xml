@@ -5,45 +5,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="10"
-    tools:context=".MapActivity">
+    android:fitsSystemWindows="true"
+    tools:context=".activities.MapActivity">
+
+    <include layout="@layout/toolbar" />
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="0.7" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_weight="9.3"
-        android:weightSum="6"
-        android:background="#CCEEFF">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/ButtonMapStyle"
-            android:text="@string/add">
-        </Button>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/ButtonMapStyle"
-            android:text="@string/filter">
-        </Button>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/ButtonMapStyle"
-            android:text="@string/help">
-        </Button>
-
-    </LinearLayout>
+        android:layout_height="match_parent" />
 
 </LinearLayout>
