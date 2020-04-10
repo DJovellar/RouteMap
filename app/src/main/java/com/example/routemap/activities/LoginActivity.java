@@ -2,8 +2,11 @@ package com.example.routemap.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -25,6 +28,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     Button loginButton;
     Button registerButton;
+
+    private static final int PERMISSION_REQUEST_CODE = 200;
+    private boolean locationPermission = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +60,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 EditText password = findViewById(R.id.password);
 
                 if(check_login(user.getText().toString(), password.getText().toString())) {
-                    Toast.makeText(this, "Sesion iniciada correctamente", Toast.LENGTH_SHORT).show();
-                    Intent in = new Intent(this, MapActivity.class);
-                    startActivity(in);
+                    checkLocationPermissions();
+                    if(locationPermission) {
+                        Toast.makeText(this, "Sesion iniciada correctamente", Toast.LENGTH_SHORT).show();
+                        Intent in = new Intent(this, MapActivity.class);
+                        startActivity(in);
+                    }
                 }else {
                     user.setText("");
                     password.setText("");
@@ -84,5 +93,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu_login_register, menu);
         return true;
+    }
+
+    private void checkLocationPermissions() {
+
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+        }
+        else {
+            locationPermission = true;
+        }
     }
 }

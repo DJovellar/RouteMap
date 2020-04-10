@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
+
 import android.view.Menu;
 
 import com.example.routemap.R;
@@ -15,6 +16,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private Toolbar toolbar;
     private GoogleMap map;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map = googleMap;
 
         //Init configuration
-        //map.setMyLocationEnabled(true);
+        map.setMyLocationEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
     }
