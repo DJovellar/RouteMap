@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/addButton"
+        android:icon="@drawable/ic_toolbar_add"
+        app:showAsAction="always"
+        android:title="@string/add" />
+
+    <item
+        android:id="@+id/filterButton"
+        android:icon="@drawable/ic_toolbar_car"
+        app:showAsAction="always"
+        android:title="@string/filter" />
+
+    <item
+        android:id="@+id/miProfileButton"
+        android:icon="@drawable/ic_toolbar_profile"
+        app:showAsAction="always"
+        android:title="@string/profile"/>
+
+    <item
+        android:id="@+id/settingsButton"
+        android:icon="@drawable/ic_toolbar_preferences"
+        app:showAsAction="always"
+        android:title="@string/preferences" />
+
+    <item
+        android:id="@+id/helpButton"
+        android:icon="@drawable/ic_toolbar_help"
+        app:showAsAction="always"
+        android:title="@string/help" />
+
+</menu>

@@ -14,4 +14,12 @@
     <string name="password2">Confirmar contraseña</string>
     <string name="enviar">Enviar</string>
     <string name="registerDescription">Rellene los siguientes campos para completar el registro de su cuenta</string>
+
+    <!-- Toolbar buttons -->
+    <string name="add">Añadir</string>
+    <string name="filter">Filtrar</string>
+    <string name="help">Ayuda</string>
+    <string name="profile">Perfil</string>
+    <string name="preferences">Preferencias</string>
+
 </resources>

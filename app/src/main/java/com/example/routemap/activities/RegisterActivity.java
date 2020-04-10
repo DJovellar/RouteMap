@@ -1,9 +1,14 @@
 package com.example.routemap.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,12 +21,19 @@ import java.util.List;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private Toolbar toolbar;
     private Button registerButton;
+
+    private static final int PERMISSION_REQUEST_CODE = 200;
+    private boolean locationPermission = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         registerButton = findViewById(R.id.sendRegisterButton);
         registerButton.setOnClickListener(this);
@@ -47,13 +59,33 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 User registredUser = new User(email.getText().toString(), user.getText().toString(), password.getText().toString());
                 //3ª Entrega: Añadir user a base de datos.
 
-                Toast.makeText(this, "Registro completado", Toast.LENGTH_SHORT).show();
-
-                //Intent in = new Intent();
-                //startActivity(in);
+                checkLocationPermissions();
+                if(locationPermission) {
+                    Toast.makeText(this, "Registro completado", Toast.LENGTH_SHORT).show();
+                    Intent in = new Intent(this, MapActivity.class);
+                    startActivity(in);
+                }
             } else {
+                password.setText("");
+                password2.setText("");
                 Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu_login_register, menu);
+        return true;
+    }
+
+    private void checkLocationPermissions() {
+
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+        }
+        else {
+            locationPermission = true;
         }
     }
 }
