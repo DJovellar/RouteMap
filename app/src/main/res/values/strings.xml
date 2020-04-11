@@ -16,10 +16,32 @@
     <string name="registerDescription">Rellene los siguientes campos para completar el registro de su cuenta</string>
 
     <!-- Toolbar buttons -->
-    <string name="add">Añadir</string>
+    <string name="route">Ruta</string>
     <string name="filter">Filtrar</string>
     <string name="help">Ayuda</string>
     <string name="profile">Perfil</string>
     <string name="preferences">Preferencias</string>
 
+    <!-- Personalized marker -->
+    <string name="inputTypeLabel">Tipo</string>
+    <string name="inputLevelLabel">Nivel</string>
+    <string name="inputDescriptionLabel">Descripción</string>
+    <string name="showTypeLabel"><b>Tipo: </b></string>
+    <string name="showLevelLabel"><b>Nivel: </b></string>
+    <string name="showDescriptionLabel"><b>Descripción: </b></string>
+    <string name="showDateLabel"><b>Fecha: </b></string>
+    <string name="showAuthorLabel"><b>Autor: </b></string>
+    <string name="spinnerTypePromp">Elige un tipo</string>
+    <string-array name="spinnerType">
+        <item>Accidente</item>
+        <item>Obras</item>
+        <item>Zona Peatonal</item>
+        <item>Visibilidad</item>
+    </string-array>
+    <string name="spinnerLevelPromp">Elige un nivel</string>
+    <string-array name="spinnerLevel">
+        <item>Leve</item>
+        <item>Moderado</item>
+        <item>Grave</item>
+    </string-array>
 </resources>

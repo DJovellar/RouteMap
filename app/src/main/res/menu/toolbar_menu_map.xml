@@ -4,13 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/addButton"
-        android:icon="@drawable/ic_toolbar_add"
+        android:id="@+id/filterButton"
+        android:icon="@drawable/ic_toolbar_filter"
         app:showAsAction="always"
-        android:title="@string/add" />
+        android:title="@string/filter" />
 
     <item
-        android:id="@+id/filterButton"
+        android:id="@+id/routeButton"
         android:icon="@drawable/ic_toolbar_car"
         app:showAsAction="always"
         android:title="@string/filter" />
