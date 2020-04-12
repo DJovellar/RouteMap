@@ -4,8 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -19,11 +25,13 @@ import android.widget.Toast;
 import com.example.routemap.R;
 import com.example.routemap.domain.InfoMarker;
 import com.example.routemap.domain.User;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.*;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -36,7 +44,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener, {
 
     private Toolbar toolbar;
     private GoogleMap map;
@@ -45,6 +53,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private View v2;
 
     private List<Marker> markers;
+
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +68,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
     }
 
@@ -118,11 +130,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         markers = new ArrayList<Marker>();
 
+        Location myLocation = goToMyCurrentLocation();
+
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
         addPersonalizedMarker(latLng);
+    }
+
+    public Location goToMyCurrentLocation (){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (locationManager != null) {
+                Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), false));
+                if (location != null) {
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                            .zoom(17)
+                            .build();
+                    map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    return location;
+                }
+                else {
+                    Toast.makeText(this, "Localización desconocida", Toast.LENGTH_SHORT).show();
+                    return null;
+                }
+            }
+            else {
+                Toast.makeText(this, "La localización no esta disponible", Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        } else {
+            Toast.makeText(this, "Falta permiso para obtener la localización", Toast.LENGTH_SHORT).show();
+            return null;
+        }
     }
 
     public void addPersonalizedMarker(final LatLng latLng) {
