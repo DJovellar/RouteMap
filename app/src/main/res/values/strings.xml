@@ -19,7 +19,7 @@
     <string name="route">Ruta</string>
     <string name="filter">Filtrar</string>
     <string name="help">Ayuda</string>
-    <string name="profile">Perfil</string>
+    <string name="logout">Perfil</string>
     <string name="preferences">Preferencias</string>
 
     <!-- Personalized marker -->
@@ -61,5 +61,12 @@
         <item>Grave</item>
     </string-array>
     <string name="filterAllAuthors">Todos</string>
+
+    <string-array name="defaultTypeMap">
+        <item>Normal</item>
+        <item>Satelite</item>
+        <item>Terreno</item>
+        <item>Hibrido</item>
+    </string-array>
 
 </resources>

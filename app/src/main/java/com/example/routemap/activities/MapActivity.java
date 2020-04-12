@@ -5,9 +5,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -36,15 +39,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private Toolbar toolbar;
     private GoogleMap map;
@@ -55,6 +55,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private List<Marker> markers;
 
     private LocationManager locationManager;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        markers = new ArrayList<>();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
     @Override
@@ -106,8 +119,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                 });
                 builder.create().show();
-
                 return true;
+
+            case R.id.settingsButton:
+                Intent in = new Intent(this, PreferencesActivity.class);
+                startActivity(in);
+                return true;
+
+            case R.id.logoutButton:
+                Toast.makeText(this, "Sesion cerrada", Toast.LENGTH_SHORT).show();
+                finish();
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -122,15 +144,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
 
+        String mapType = preferences.getString("defaultTypeMap", "Normal");
+        switch (mapType) {
+            case "Normal":
+                map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+            case "Satelite":
+                map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+            case "Terreno":
+                map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
+            case "Hibrido":
+                map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+        }
+
+        String zoomString = preferences.getString("defaultZoomMap", "16");
+        int zoom =  Integer.parseInt(zoomString);
+
         map.setInfoWindowAdapter(new CustomInfoWindowAdapter(getLayoutInflater().from(this)));
 
         map.setOnMapClickListener(this);
         map.setOnMarkerClickListener(this);
         map.setOnInfoWindowClickListener(this);
+        preferences.registerOnSharedPreferenceChangeListener(this);
 
-        markers = new ArrayList<Marker>();
-
-        Location myLocation = goToMyCurrentLocation();
+        Location myLocation = goToMyCurrentLocation(zoom);
 
         addDefaultMarker("Accidente", "Marker predefinido 1", "Leve", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude() + 0.001d, myLocation.getLongitude()));
         addDefaultMarker("Obras", "Marker predefinido 2", "Moderado", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude(), myLocation.getLongitude() +0.001d));
@@ -144,7 +184,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         addPersonalizedMarker(latLng);
     }
 
-    public Location goToMyCurrentLocation (){
+    public Location goToMyCurrentLocation (int zoom){
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (locationManager != null) {
                 Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), false));
@@ -153,7 +193,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
                     CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(new LatLng(location.getLatitude(), location.getLongitude()))
-                            .zoom(16)
+                            .zoom(zoom)
                             .build();
                     map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     return location;
@@ -280,6 +320,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onInfoWindowClick(Marker marker) {
         marker.hideInfoWindow();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("defaultTypeMap")) {
+            String mapType = sharedPreferences.getString("defaultTypeMap", "Normal");
+            switch (mapType) {
+                case "Normal":
+                    map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                    break;
+                case "Satelite":
+                    map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                    break;
+                case "Terreno":
+                    map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                    break;
+                case "Hibrido":
+                    map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                    break;
+            }
+        }
+
+        if(key.equals("defaultZoomMap")) {
+            String zoomString = sharedPreferences.getString("defaultZoomMap", "16");
+            int zoom =  Integer.parseInt(zoomString);
+            map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+        }
     }
 
     //Custom Info Window for the markers
