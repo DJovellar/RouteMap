@@ -26,6 +26,7 @@
     <string name="inputTypeLabel">Tipo</string>
     <string name="inputLevelLabel">Nivel</string>
     <string name="inputDescriptionLabel">Descripción</string>
+    <string name="inputAuthorLabel">Autor</string>
     <string name="showTypeLabel"><b>Tipo: </b></string>
     <string name="showLevelLabel"><b>Nivel: </b></string>
     <string name="showDescriptionLabel"><b>Descripción: </b></string>
@@ -44,4 +45,21 @@
         <item>Moderado</item>
         <item>Grave</item>
     </string-array>
+
+    <!-- Filter option -->
+    <string-array name="filterSpinnerType">
+        <item>Todos</item>
+        <item>Accidente</item>
+        <item>Obras</item>
+        <item>Zona Peatonal</item>
+        <item>Visibilidad</item>
+    </string-array>
+    <string-array name="filterSpinnerLevel">
+        <item>Todos</item>
+        <item>Leve</item>
+        <item>Moderado</item>
+        <item>Grave</item>
+    </string-array>
+    <string name="filterAllAuthors">Todos</string>
+
 </resources>

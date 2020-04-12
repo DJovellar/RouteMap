@@ -28,8 +28,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener {
 
@@ -37,6 +42,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap map;
 
     private View v1;
+    private View v2;
+
+    private List<Marker> markers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +72,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         switch (item.getItemId()) {
             case R.id.filterButton:
-                Toast.makeText(this, "Pulsado el boton de filtrar", Toast.LENGTH_SHORT).show();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                LayoutInflater inflater = getLayoutInflater();
+
+                v2 = inflater.inflate(R.layout.filter_options, null);
+
+                builder.setView(v2).setPositiveButton("Filtrar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String type = ((Spinner) v2.findViewById(R.id.filterType)).getSelectedItem().toString();
+                        String level = ((Spinner) v2.findViewById(R.id.filterLevel)).getSelectedItem().toString();
+                        String author = ((TextView) v2.findViewById(R.id.filterAuthor)).getText().toString();
+
+                        filterResults(type, level, author);
+                    }
+                }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.create().show();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -85,6 +115,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.setOnMapClickListener(this);
         map.setOnMarkerClickListener(this);
         map.setOnInfoWindowClickListener(this);
+
+        markers = new ArrayList<Marker>();
+
     }
 
     @Override
@@ -127,7 +160,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                         break;
                 }
-                map.addMarker(markerOptions).setTag(infoMarker);
+
+                Marker marker = map.addMarker(markerOptions);
+                marker.setTag(infoMarker);
+                markers.add(marker);
             }
         }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
@@ -136,6 +172,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
         builder.create().show();
+    }
+
+    public void filterResults(String type, String level, String author) {
+        if(!markers.isEmpty()) {
+            for (Marker marker : markers) {
+                InfoMarker infoMarker = (InfoMarker) marker.getTag();
+                if ((infoMarker.getType().equals(type) || type.equals("Todos"))
+                        && (infoMarker.getLevel().equals(level) || level.equals("Todos"))
+                        && (infoMarker.getAuthor().getUser().equals(author) || author.isEmpty())) {
+                            marker.setVisible(true);
+                }
+                else {
+                    marker.setVisible(false);
+                }
+            }
+        }
     }
 
     @Override

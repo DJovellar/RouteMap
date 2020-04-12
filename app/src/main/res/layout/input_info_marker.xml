@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:padding="5dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="15dp"/>
 
     <Spinner
         android:id="@+id/input_info_type"
@@ -14,7 +17,11 @@
         style="@style/SpinnerStyle"
         android:spinnerMode="dropdown"
         android:prompt="@string/spinnerTypePromp"
-        android:entries="@array/spinnerType"/>
+        android:entries="@array/spinnerType" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="15dp"/>
 
     <Spinner
         android:id="@+id/input_info_level"
@@ -23,6 +30,10 @@
         style="@style/SpinnerStyle"
         android:prompt="@string/spinnerLevelPromp"
         android:entries="@array/spinnerLevel"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="15dp"/>
 
     <EditText
         android:id="@+id/input_info_description"

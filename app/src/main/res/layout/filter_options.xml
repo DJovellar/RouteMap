@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="15dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/filterTypeLabel"
+            style="@style/TextViewStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="19dp"
+            android:text="@string/showTypeLabel" />
+
+        <Spinner
+            android:id="@+id/filterType"
+            style="@style/SpinnerStyle"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:entries="@array/filterSpinnerType" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="15dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/layout1">
+
+        <TextView
+            android:id="@+id/filterLevelLabel"
+            style="@style/TextViewStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="15dp"
+            android:text="@string/showLevelLabel" />
+
+        <Spinner
+            android:id="@+id/filterLevel"
+            style="@style/SpinnerStyle"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:entries="@array/filterSpinnerLevel" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="15dp"
+        android:layout_below="@+id/layout2">
+
+        <TextView
+            android:id="@+id/filterAuthorLabel"
+            style="@style/TextViewStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="10dp"
+            android:text="@string/showAuthorLabel" />
+
+        <EditText
+            android:id="@+id/filterAuthor"
+            style="@style/EditTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="7"
+            android:hint="@string/filterAllAuthors"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
