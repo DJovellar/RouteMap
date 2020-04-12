@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="USUARIO">
+        <EditTextPreference
+            android:key="changePassword"
+            android:title="Cambiar contraseña"
+            android:summary="Modifica la contraseña de tu cuenta"
+            android:dialogTitle="Nueva contraseña"/>
+
+        <PreferenceScreen
+            android:title="Subscripcion Premium"
+            android:summary="Adquiere la version Premium para disfrutar de multiples ventajas">
+
+            <!-- 3ª Entrega: Falta intent a nueva activity -->
+
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="MAPA">
+        <ListPreference
+            android:key="defaultTypeMap"
+            android:title="Tipo de mapa"
+            android:summary="Elige el tipo de mapa por defecto"
+            android:entries="@array/defaultTypeMap"
+            android:icon="@android:drawable/ic_menu_mapmode"
+            android:entryValues="@array/defaultTypeMap"
+            android:defaultValue="Normal" />
+
+        <EditTextPreference
+            android:key="defaultZoomMap"
+            android:title="Zoom"
+            android:summary="Define el zoom por defecto al cargar el mapa"
+            android:defaultValue="14"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="INFORMACIÓN">
+        <PreferenceScreen
+            android:title="Manual de uso"
+            android:summary="Aprende a utilizar correctamente la aplicación">
+
+            <!-- 3ª Entrega: Falta intent a nueva activity -->
+
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="Acerca de mi"
+            android:summary="Conoce mas sobre el creador de la aplicación">
+
+            <!-- 3ª Entrega: Falta intent a nueva activity -->
+
+        </PreferenceScreen>
+    </PreferenceCategory>
+</PreferenceScreen>

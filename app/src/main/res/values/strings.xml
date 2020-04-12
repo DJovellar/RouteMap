@@ -62,4 +62,11 @@
     </string-array>
     <string name="filterAllAuthors">Todos</string>
 
+    <string-array name="defaultTypeMap">
+        <item>Normal</item>
+        <item>Satelite</item>
+        <item>Terreno</item>
+        <item>Hibrido</item>
+    </string-array>
+
 </resources>
