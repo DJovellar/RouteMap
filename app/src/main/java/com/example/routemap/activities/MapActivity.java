@@ -132,6 +132,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Location myLocation = goToMyCurrentLocation();
 
+        addDefaultMarker("Accidente", "Marker predefinido 1", "Leve", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude() + 0.001d, myLocation.getLongitude()));
+        addDefaultMarker("Obras", "Marker predefinido 2", "Moderado", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude(), myLocation.getLongitude() +0.001d));
+        addDefaultMarker("Zona Peatonal", "Marker predefinido 3", "Grave", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude() + 0.002d, myLocation.getLongitude()));
+        addDefaultMarker("Obras", "Marker predefinido 4", "Leve", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude(), myLocation.getLongitude() +0.002d));
+        addDefaultMarker("Visibilidad", "Marker predefinido 5", "Moderado", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude() + 0.002d, myLocation.getLongitude() +0.002d));
     }
 
     @Override
@@ -144,10 +149,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             if (locationManager != null) {
                 Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), false));
                 if (location != null) {
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
+
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
                     CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(new LatLng(location.getLatitude(), location.getLongitude()))
-                            .zoom(17)
+                            .zoom(16)
                             .build();
                     map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     return location;
@@ -165,6 +171,39 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Toast.makeText(this, "Falta permiso para obtener la localización", Toast.LENGTH_SHORT).show();
             return null;
         }
+    }
+
+    public void addDefaultMarker(String type, String description, String level, User author, LatLng latLng) {
+
+        InfoMarker infoMarker = new InfoMarker();
+        infoMarker.setType(type);
+        infoMarker.setDescription(description);
+        infoMarker.setLevel(level);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm");
+        infoMarker.setDate(sdf.format(new Date()));
+
+        //3º Entrega: Obtener de BBDD
+        infoMarker.setAuthor(author);
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+
+        switch (infoMarker.getLevel()) {
+            case "Leve":
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                break;
+            case "Moderado":
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                break;
+            case "Grave":
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                break;
+        }
+
+        Marker marker = map.addMarker(markerOptions);
+        marker.setTag(infoMarker);
+        markers.add(marker);
     }
 
     public void addPersonalizedMarker(final LatLng latLng) {
