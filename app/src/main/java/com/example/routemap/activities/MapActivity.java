@@ -44,7 +44,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener, {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener {
 
     private Toolbar toolbar;
     private GoogleMap map;
