@@ -13,13 +13,7 @@
         android:id="@+id/routeButton"
         android:icon="@drawable/ic_toolbar_car"
         app:showAsAction="always"
-        android:title="@string/filter" />
-
-    <item
-        android:id="@+id/miProfileButton"
-        android:icon="@drawable/ic_toolbar_profile"
-        app:showAsAction="always"
-        android:title="@string/profile"/>
+        android:title="@string/route" />
 
     <item
         android:id="@+id/settingsButton"
@@ -33,4 +27,9 @@
         app:showAsAction="always"
         android:title="@string/help" />
 
+    <item
+        android:id="@+id/logoutButton"
+        android:icon="@drawable/ic_toolbar_logout"
+        app:showAsAction="always"
+        android:title="@string/logout"/>
 </menu>

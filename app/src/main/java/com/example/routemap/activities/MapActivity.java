@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
 import android.Manifest;
@@ -40,13 +39,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -123,12 +119,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                 });
                 builder.create().show();
-
                 return true;
 
             case R.id.settingsButton:
                 Intent in = new Intent(this, PreferencesActivity.class);
                 startActivity(in);
+                return true;
+
+            case R.id.logoutButton:
+                Toast.makeText(this, "Sesion cerrada", Toast.LENGTH_SHORT).show();
+                finish();
+
             default:
                 return super.onOptionsItemSelected(item);
         }

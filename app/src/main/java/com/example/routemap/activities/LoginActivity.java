@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if(check_login(user.getText().toString(), password.getText().toString())) {
                     checkLocationPermissions();
                     if(locationPermission) {
-                        Toast.makeText(this, "Sesion iniciada correctamente", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Sesion iniciada", Toast.LENGTH_SHORT).show();
                         Intent in = new Intent(this, MapActivity.class);
                         startActivity(in);
                     }
