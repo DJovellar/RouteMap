@@ -59,6 +59,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 EditText user = findViewById(R.id.user);
                 EditText password = findViewById(R.id.password);
 
+                if (user.getText().toString().isEmpty() || password.getText().toString().isEmpty()) {
+                    Toast.makeText(this, "Ambos campos son obligatorios", Toast.LENGTH_SHORT).show();
+                    user.setText("");
+                    user.requestFocus();
+                    password.setText("");
+                    break;
+                }
+
                 if(check_login(user.getText().toString(), password.getText().toString())) {
                     checkLocationPermissions();
                     if(locationPermission) {
@@ -68,6 +76,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 }else {
                     user.setText("");
+                    user.requestFocus();
                     password.setText("");
                     Toast.makeText(this, "Error en los datos introducidos", Toast.LENGTH_SHORT).show();
                 }
@@ -81,6 +90,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public Boolean check_login(String user, String password) {
+
         for (User registredUser : registredUsers) {
             if (registredUser.getUser().equals(user) && registredUser.getPassword().equals(password)) {
                 return true;
