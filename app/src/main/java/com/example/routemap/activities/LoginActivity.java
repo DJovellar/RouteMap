@@ -1,17 +1,16 @@
 package com.example.routemap.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.routemap.R;
@@ -22,12 +21,10 @@ import java.util.List;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Toolbar toolbar;
-
     private List<User> registredUsers;
 
     Button loginButton;
-    Button registerButton;
+    TextView registerButton;
 
     private static final int PERMISSION_REQUEST_CODE = 200;
     private boolean locationPermission = false;
@@ -36,9 +33,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         //3ª Entrega: Obtener lista de usuarios registrados de la Base de Datos
         registredUsers = new ArrayList<>();
@@ -97,12 +91,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         }
         return false;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu_login_register, menu);
-        return true;
     }
 
     private void checkLocationPermissions() {
