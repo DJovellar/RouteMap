@@ -21,7 +21,6 @@ import java.util.List;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Toolbar toolbar;
     private Button registerButton;
 
     private static final int PERMISSION_REQUEST_CODE = 200;
@@ -31,9 +30,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         registerButton = findViewById(R.id.sendRegisterButton);
         registerButton.setOnClickListener(this);
@@ -68,15 +64,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             } else {
                 password.setText("");
                 password2.setText("");
+                password.requestFocus();
                 Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu_login_register, menu);
-        return true;
     }
 
     private void checkLocationPermissions() {

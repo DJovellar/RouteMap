@@ -10,8 +10,7 @@
     <!-- Register layout -->
     <string name="email">Email</string>
     <string name="password2">Confirmar contraseña</string>
-    <string name="enviar">Enviar</string>
-    <string name="registerDescription">Rellene los siguientes campos para completar el registro de su cuenta</string>
+    <string name="enviar">Confirmar</string>
 
     <!-- Toolbar buttons -->
     <string name="route">Ruta</string>
