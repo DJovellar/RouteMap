@@ -17,8 +17,8 @@
         android:gravity="center_horizontal">
 
         <ImageView
-            android:layout_width="120dp"
-            android:layout_height="150dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:src="@drawable/route_map_icon" />
 
         <TextView
@@ -37,7 +37,7 @@
             android:layout_marginTop="50dp"
             android:hint="@string/email"
             android:ems="10"
-            android:background="#11000000"
+            android:background="@drawable/edit_text_design"
             android:textSize="16sp"
             android:textAlignment="center"
             android:inputType="textEmailAddress"
@@ -56,7 +56,7 @@
             android:layout_marginTop="38dp"
             android:textAlignment="center"
             android:ems="10"
-            android:background="#11000000"
+            android:background="@drawable/edit_text_design"
             android:textColorHint="@drawable/selector_edit_text"
             android:drawableLeft="@drawable/ic_action_user"
             android:inputType="text"
@@ -73,7 +73,7 @@
             android:layout_marginTop="38dp"
             android:textAlignment="center"
             android:ems="10"
-            android:background="#11000000"
+            android:background="@drawable/edit_text_design"
             android:textColorHint="@drawable/selector_edit_text"
             android:drawableLeft="@drawable/ic_action_password"
             android:inputType="textPassword"
@@ -90,7 +90,7 @@
             android:layout_marginTop="38dp"
             android:textAlignment="center"
             android:ems="10"
-            android:background="#11000000"
+            android:background="@drawable/edit_text_design"
             android:textColorHint="@drawable/selector_edit_text"
             android:drawableLeft="@drawable/ic_action_password"
             android:inputType="textPassword"

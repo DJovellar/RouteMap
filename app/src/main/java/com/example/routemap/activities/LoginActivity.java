@@ -25,6 +25,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     Button loginButton;
     TextView registerButton;
+    EditText user;
+    EditText password;
 
     private static final int PERMISSION_REQUEST_CODE = 200;
     private boolean locationPermission = false;
@@ -40,6 +42,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         loginButton = findViewById(R.id.loginButton);
         registerButton = findViewById(R.id.registerButton);
+        user = findViewById(R.id.user);
+        password = findViewById(R.id.password);
 
         loginButton.setOnClickListener(this);
         registerButton.setOnClickListener(this);
@@ -49,22 +53,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.loginButton:
-
-                EditText user = findViewById(R.id.user);
-                EditText password = findViewById(R.id.password);
-
                 if (user.getText().toString().isEmpty() || password.getText().toString().isEmpty()) {
-                    Toast.makeText(this, "Ambos campos son obligatorios", Toast.LENGTH_SHORT).show();
                     user.setText("");
                     user.requestFocus();
                     password.setText("");
+                    Toast.makeText(this, "Ambos campos son obligatorios", Toast.LENGTH_SHORT).show();
                     break;
                 }
 
                 if(check_login(user.getText().toString(), password.getText().toString())) {
                     checkLocationPermissions();
                     if(locationPermission) {
-                        Toast.makeText(this, "Sesion iniciada", Toast.LENGTH_SHORT).show();
                         Intent in = new Intent(this, MapActivity.class);
                         startActivity(in);
                     }
@@ -72,7 +71,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     user.setText("");
                     user.requestFocus();
                     password.setText("");
-                    Toast.makeText(this, "Error en los datos introducidos", Toast.LENGTH_SHORT).show();
+                    user.setBackground(getDrawable(R.drawable.edit_text_design_error));
+                    password.setBackground(getDrawable(R.drawable.edit_text_design_error));
                 }
                 break;
 
@@ -101,5 +101,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         else {
             locationPermission = true;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        user.setBackground(getDrawable(R.drawable.edit_text_design));
+        password.setBackground(getDrawable(R.drawable.edit_text_design));
+        super.onResume();
     }
 }

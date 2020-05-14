@@ -22,6 +22,10 @@ import java.util.List;
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button registerButton;
+    EditText email;
+    EditText user;
+    EditText password;
+    EditText password2;
 
     private static final int PERMISSION_REQUEST_CODE = 200;
     private boolean locationPermission = false;
@@ -32,6 +36,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_register);
 
         registerButton = findViewById(R.id.sendRegisterButton);
+        email = findViewById(R.id.registerEmail);
+        user = findViewById(R.id.registerUser);
+        password = findViewById(R.id.registerPassword);
+        password2 = findViewById(R.id.registerPassword2);
+
         registerButton.setOnClickListener(this);
     }
 
@@ -65,6 +74,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 password.setText("");
                 password2.setText("");
                 password.requestFocus();
+                password.setBackground(getDrawable(R.drawable.edit_text_design_error));
+                password2.setBackground(getDrawable(R.drawable.edit_text_design_error));
                 Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
             }
         }
@@ -78,5 +89,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         else {
             locationPermission = true;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        password.setBackground(getDrawable(R.drawable.edit_text_design));
+        password2.setBackground(getDrawable(R.drawable.edit_text_design));
+        super.onResume();
     }
 }
