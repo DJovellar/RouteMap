@@ -66,4 +66,9 @@
         <item>Hibrido</item>
     </string-array>
 
+    <string-array name="networkSpinnerType">
+        <item>Wifi</item>
+        <item>Datos</item>
+    </string-array>
+
 </resources>

@@ -15,6 +15,9 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -49,13 +52,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Toolbar toolbar;
     private GoogleMap map;
 
-    private View v1;
+    private View v1;v b
     private View v2;
 
     private List<Marker> markers;
 
     private LocationManager locationManager;
     private SharedPreferences preferences;
+    private WifiManager wifiManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +74,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
         markers = new ArrayList<>();
     }
 
@@ -78,6 +84,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String networkConnectionType = preferences.getString("networkType", "Wifi");
+        if(networkConnectionType.equals("Wifi")) {
+            wifiManager.setWifiEnabled(true);
+        }
+        else {
+            wifiManager.setWifiEnabled(false);
+        }
     }
 
     @Override
@@ -346,6 +360,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             String zoomString = sharedPreferences.getString("defaultZoomMap", "16");
             int zoom =  Integer.parseInt(zoomString);
             map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+        }
+
+        if(key.equals("networkType")) {
+            String networkConnectionType = preferences.getString("networkType", "Wifi");
+            if(networkConnectionType.equals("Wifi")) {
+                wifiManager.setWifiEnabled(true);
+            }
+            else {
+                wifiManager.setWifiEnabled(false);
+            }
         }
     }
 
