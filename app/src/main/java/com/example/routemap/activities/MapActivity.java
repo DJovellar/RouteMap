@@ -52,7 +52,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Toolbar toolbar;
     private GoogleMap map;
 
-    private View v1;v b
+    private View v1;
     private View v2;
 
     private List<Marker> markers;
