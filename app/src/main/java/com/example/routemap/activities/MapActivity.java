@@ -12,9 +12,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -28,6 +27,11 @@ import android.widget.Toast;
 import com.example.routemap.R;
 import com.example.routemap.domain.InfoMarker;
 import com.example.routemap.domain.User;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.*;
@@ -38,6 +42,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,8 +59,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private List<Marker> markers;
 
-    private LocationManager locationManager;
     private SharedPreferences preferences;
+    private WifiManager wifiManager;
+
+    private Location location;
+    private LocationCallback locationCallback;
+    private LocationRequest locationRequest;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
+    private boolean showCurrentLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,19 +82,37 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        createLocationCallback();
+        createLocationRequest();
+
         markers = new ArrayList<>();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        startLocationUpdates();
+
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String networkConnectionType = preferences.getString("networkType", "Wifi");
+        if(networkConnectionType.equals("Wifi")) {
+            wifiManager.setWifiEnabled(true);
+        }
+        else {
+            wifiManager.setWifiEnabled(false);
+        }
+        showCurrentLocation = false;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        stopLocationUpdates();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
@@ -160,23 +190,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 break;
         }
 
-        String zoomString = preferences.getString("defaultZoomMap", "16");
-        int zoom =  Integer.parseInt(zoomString);
-
         map.setInfoWindowAdapter(new CustomInfoWindowAdapter(getLayoutInflater().from(this)));
 
         map.setOnMapClickListener(this);
         map.setOnMarkerClickListener(this);
         map.setOnInfoWindowClickListener(this);
         preferences.registerOnSharedPreferenceChangeListener(this);
-
-        Location myLocation = goToMyCurrentLocation(zoom);
-
-        addDefaultMarker("Accidente", "Marker predefinido 1", "Leve", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude() + 0.001d, myLocation.getLongitude()));
-        addDefaultMarker("Obras", "Marker predefinido 2", "Moderado", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude(), myLocation.getLongitude() +0.001d));
-        addDefaultMarker("Zona Peatonal", "Marker predefinido 3", "Grave", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude() + 0.002d, myLocation.getLongitude()));
-        addDefaultMarker("Obras", "Marker predefinido 4", "Leve", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude(), myLocation.getLongitude() +0.002d));
-        addDefaultMarker("Visibilidad", "Marker predefinido 5", "Moderado", new User("test@test.com", "Sistem", "1234"), new LatLng(myLocation.getLatitude() + 0.002d, myLocation.getLongitude() +0.002d));
     }
 
     @Override
@@ -184,32 +203,62 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         addPersonalizedMarker(latLng);
     }
 
-    public Location goToMyCurrentLocation (int zoom){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (locationManager != null) {
-                Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), false));
-                if (location != null) {
+    private void startLocationUpdates() {
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+    }
 
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(location.getLatitude(), location.getLongitude()))
-                            .zoom(zoom)
-                            .build();
-                    map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                    return location;
+    private void stopLocationUpdates() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+    private void createLocationCallback() {
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                location = locationResult.getLastLocation();
+                if (location != null) {
+                    if (!showCurrentLocation) {
+                        addDefaultMarker("Accidente", "Marker predefinido 1", "Leve", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude() + 0.001d, location.getLongitude()));
+                        addDefaultMarker("Obras", "Marker predefinido 2", "Moderado", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude(), location.getLongitude() + 0.001d));
+                        addDefaultMarker("Zona Peatonal", "Marker predefinido 3", "Grave", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude() + 0.002d, location.getLongitude()));
+                        addDefaultMarker("Obras", "Marker predefinido 4", "Leve", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude(), location.getLongitude() + 0.002d));
+                        addDefaultMarker("Visibilidad", "Marker predefinido 5", "Moderado", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude() + 0.002d, location.getLongitude() + 0.002d));
+
+                        String zoomString = preferences.getString("defaultZoomMap", "16");
+                        int zoom = Integer.parseInt(zoomString);
+
+                        goToMyCurrentLocation(zoom);
+                        showCurrentLocation = true;
+                    }
                 }
-                else {
-                    Toast.makeText(this, "Localización desconocida", Toast.LENGTH_SHORT).show();
-                    return null;
-                }
+            }
+        };
+    }
+
+    private void createLocationRequest() {
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(100000);
+        locationRequest.setFastestInterval(50000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    public void goToMyCurrentLocation (int zoom){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (location != null) {
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                        .zoom(zoom)
+                        .build();
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
             else {
-                Toast.makeText(this, "La localización no esta disponible", Toast.LENGTH_SHORT).show();
-                return null;
+                Toast.makeText(this, "Localización desconocida", Toast.LENGTH_SHORT).show();
             }
-        } else {
+        }
+        else {
             Toast.makeText(this, "Falta permiso para obtener la localización", Toast.LENGTH_SHORT).show();
-            return null;
         }
     }
 
@@ -346,6 +395,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             String zoomString = sharedPreferences.getString("defaultZoomMap", "16");
             int zoom =  Integer.parseInt(zoomString);
             map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+        }
+
+        if(key.equals("networkType")) {
+            String networkConnectionType = sharedPreferences.getString("networkType", "Wifi");
+            if(networkConnectionType.equals("Wifi")) {
+                wifiManager.setWifiEnabled(true);
+            }
+            else {
+                wifiManager.setWifiEnabled(false);
+            }
         }
     }
 

@@ -2,18 +2,15 @@
     <string name="app_name">Route Map</string>
 
     <!-- Login layout -->
-    <string name="loginTextLabel">Accede a tu cuenta</string>
     <string name="user">Usuario</string>
     <string name="password">Contraseña</string>
-    <string name="loginLabel">Iniciar sesion</string>
-    <string name="registerTextLabel">¿Todavia no tienes una cuenta?</string>
-    <string name="registerLabel">Registrarse</string>
+    <string name="loginLabel">Entrar</string>
+    <string name="registerLabel">Registrate aqui</string>
 
     <!-- Register layout -->
     <string name="email">Email</string>
     <string name="password2">Confirmar contraseña</string>
-    <string name="enviar">Enviar</string>
-    <string name="registerDescription">Rellene los siguientes campos para completar el registro de su cuenta</string>
+    <string name="enviar">Confirmar</string>
 
     <!-- Toolbar buttons -->
     <string name="route">Ruta</string>
@@ -67,6 +64,11 @@
         <item>Satelite</item>
         <item>Terreno</item>
         <item>Hibrido</item>
+    </string-array>
+
+    <string-array name="networkSpinnerType">
+        <item>Wifi</item>
+        <item>Datos</item>
     </string-array>
 
 </resources>

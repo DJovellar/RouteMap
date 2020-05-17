@@ -15,6 +15,14 @@
 
         </PreferenceScreen>
 
+        <ListPreference
+            android:key="networkType"
+            android:title="Configuracion de red"
+            android:summary="Elige el modo de conexion deseado"
+            android:entries="@array/networkSpinnerType"
+            android:entryValues="@array/networkSpinnerType"
+            android:defaultValue="Wifi" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="MAPA">

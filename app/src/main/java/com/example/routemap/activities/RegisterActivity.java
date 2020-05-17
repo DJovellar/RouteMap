@@ -21,8 +21,11 @@ import java.util.List;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Toolbar toolbar;
     private Button registerButton;
+    EditText email;
+    EditText user;
+    EditText password;
+    EditText password2;
 
     private static final int PERMISSION_REQUEST_CODE = 200;
     private boolean locationPermission = false;
@@ -32,10 +35,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         registerButton = findViewById(R.id.sendRegisterButton);
+        email = findViewById(R.id.registerEmail);
+        user = findViewById(R.id.registerUser);
+        password = findViewById(R.id.registerPassword);
+        password2 = findViewById(R.id.registerPassword2);
+
         registerButton.setOnClickListener(this);
     }
 
@@ -68,15 +73,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             } else {
                 password.setText("");
                 password2.setText("");
+                password.requestFocus();
+                password.setBackground(getDrawable(R.drawable.edit_text_design_error));
+                password2.setBackground(getDrawable(R.drawable.edit_text_design_error));
                 Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu_login_register, menu);
-        return true;
     }
 
     private void checkLocationPermissions() {
@@ -87,5 +89,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         else {
             locationPermission = true;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        password.setBackground(getDrawable(R.drawable.edit_text_design));
+        password2.setBackground(getDrawable(R.drawable.edit_text_design));
+        super.onResume();
     }
 }
