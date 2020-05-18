@@ -43,6 +43,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,6 +71,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private boolean showCurrentLocation = false;
 
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser currentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +94,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         createLocationRequest();
 
         markers = new ArrayList<>();
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
     }
 
     @Override
@@ -157,6 +165,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 return true;
 
             case R.id.logoutButton:
+                firebaseAuth.signOut();
                 Toast.makeText(this, "Sesion cerrada", Toast.LENGTH_SHORT).show();
                 finish();
 

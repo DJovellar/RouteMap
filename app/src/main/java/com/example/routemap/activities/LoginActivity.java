@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,5 +155,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         user.setBackground(getDrawable(R.drawable.edit_text_design));
         password.setBackground(getDrawable(R.drawable.edit_text_design));
         super.onResume();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if(currentUser != null) {
+            checkLocationPermissions();
+            if(locationPermission) {
+                Intent in = new Intent(this, MapActivity.class);
+                startActivity(in);
+            }
+        }
     }
 }
