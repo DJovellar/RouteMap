@@ -14,13 +14,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.routemap.R;
-import com.example.routemap.domain.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
@@ -32,7 +32,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private EditText password2;
 
     private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore firebaseFirestore;
 
     private static final int PERMISSION_REQUEST_CODE = 200;
     private boolean locationPermission = false;
@@ -51,7 +50,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         registerButton.setOnClickListener(this);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
     }
 
     @Override
@@ -71,8 +69,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
 
-                                        User infoUser = new User(email.getText().toString(), alias.getText().toString() , password.getText().toString());
-                                        firebaseFirestore.collection("Users").add(infoUser);
+                                        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(alias.getText().toString()).build();
+                                        firebaseUser.updateProfile(profileUpdates);
 
                                         Intent in = new Intent(getApplicationContext(), MapActivity.class);
                                         startActivity(in);

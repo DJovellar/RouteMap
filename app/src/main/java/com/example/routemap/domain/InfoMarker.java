@@ -6,11 +6,11 @@ public class InfoMarker {
     private String description;
     private String level;
     private String date;
-    private User author;
+    private String author;
 
     public InfoMarker() {  }
 
-    public InfoMarker(String type, String description, String level, String date, User author) {
+    public InfoMarker(String type, String description, String level, String date, String author) {
         this.type = type;
         this.description = description;
         this.level = level;
@@ -50,11 +50,11 @@ public class InfoMarker {
         this.date = date;
     }
 
-    public User getAuthor() {
+    public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(String author) {
         this.author = author;
     }
 }
