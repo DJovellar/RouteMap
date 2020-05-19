@@ -9,6 +9,7 @@
 
     <!-- Register layout -->
     <string name="email">Email</string>
+    <string name="alias">Alias</string>
     <string name="password2">Confirmar contraseña</string>
     <string name="enviar">Confirmar</string>
 

@@ -14,21 +14,25 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.routemap.R;
+import com.example.routemap.domain.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button registerButton;
-    EditText email;
-    EditText password;
-    EditText password2;
+    private EditText email;
+    private EditText alias;
+    private EditText password;
+    private EditText password2;
 
     private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firebaseFirestore;
 
     private static final int PERMISSION_REQUEST_CODE = 200;
     private boolean locationPermission = false;
@@ -42,15 +46,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         email = findViewById(R.id.registerEmail);
         password = findViewById(R.id.registerPassword);
         password2 = findViewById(R.id.registerPassword2);
+        alias = findViewById(R.id.registerAlias);
 
         registerButton.setOnClickListener(this);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
     }
 
     @Override
     public void onClick(View v) {
         if (email.getText().toString().equals("")
+                || alias.getText().toString().equals("")
                 || password.getText().toString().equals("")
                 || password2.getText().toString().equals("")) {
             Toast.makeText(this, "Todos los campos son obligatorios", Toast.LENGTH_LONG).show();
@@ -63,6 +70,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
+
+                                        User infoUser = new User(email.getText().toString(), alias.getText().toString() , password.getText().toString());
+                                        firebaseFirestore.collection("Users").add(infoUser);
+
                                         Intent in = new Intent(getApplicationContext(), MapActivity.class);
                                         startActivity(in);
                                     }
@@ -73,17 +84,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                         switch (errorCode) {
                                             case "ERROR_INVALID_EMAIL":
                                                 Toast.makeText(RegisterActivity.this, "El formato del email no es valido", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(email, null, null);
+                                                showBorderErrors(email, null,null, null);
                                                 email.requestFocus();
                                                 break;
                                             case "ERROR_EMAIL_ALREADY_IN_USE":
                                                 Toast.makeText(RegisterActivity.this, "El email ya esta registrado", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(email, null, null);
+                                                showBorderErrors(email, null,null, null);
                                                 email.requestFocus();
                                                 break;
                                             case "ERROR_WEAK_PASSWORD":
                                                 Toast.makeText(RegisterActivity.this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(null, password, password2);
+                                                showBorderErrors(null, null, password, password2);
                                                 password.requestFocus();
                                                 break;
                                             default:
@@ -97,7 +108,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(this, "Acepte los permisos para registrarse en la aplicación", Toast.LENGTH_LONG).show();
                 }
             } else {
-                showBorderErrors(null, password, password2);
+                showBorderErrors(null, null, password, password2);
                 password.requestFocus();
                 Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_LONG).show();
             }
@@ -114,13 +125,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    public void showBorderErrors(EditText email_aux, EditText password_aux, EditText password2_aux) {
+    public void showBorderErrors(EditText email_aux, EditText user_aux, EditText password_aux, EditText password2_aux) {
 
         if (email_aux == null) {
             email.setBackground(getDrawable(R.drawable.edit_text_design));
         } else {
             email.setText("");
             email.setBackground(getDrawable(R.drawable.edit_text_design_error));
+        }
+
+        if (user_aux == null) {
+            alias.setBackground(getDrawable(R.drawable.edit_text_design));
+        } else {
+            alias.setText("");
+            alias.setBackground(getDrawable(R.drawable.edit_text_design_error));
         }
 
         if(password_aux == null) {

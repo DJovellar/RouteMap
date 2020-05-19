@@ -3,12 +3,12 @@ package com.example.routemap.domain;
 public class User {
 
     private String email;
-    private String user;
+    private String alias;
     private String password;
 
     public User(String email, String user, String password) {
         this.email = email;
-        this.user = user;
+        this.alias = user;
         this.password = password;
     }
 
@@ -20,12 +20,12 @@ public class User {
         this.email = email;
     }
 
-    public String getUser() {
-        return user;
+    public String getAlias() {
+        return alias;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public String getPassword() {
@@ -40,7 +40,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "email='" + email + '\'' +
-                ", user='" + user + '\'' +
+                ", user='" + alias + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }
