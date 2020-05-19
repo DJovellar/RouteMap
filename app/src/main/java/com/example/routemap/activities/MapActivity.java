@@ -26,7 +26,6 @@ import android.widget.Toast;
 
 import com.example.routemap.R;
 import com.example.routemap.domain.InfoMarker;
-import com.example.routemap.domain.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -42,9 +41,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,6 +78,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FirebaseAuth firebaseAuth;
     private FirebaseUser currentUser;
 
+    private FirebaseFirestore firebaseFirestore;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,6 +103,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
+
+        firebaseFirestore = FirebaseFirestore.getInstance();
     }
 
     @Override
@@ -228,12 +236,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 location = locationResult.getLastLocation();
                 if (location != null) {
                     if (!showCurrentLocation) {
-                        addDefaultMarker("Accidente", "Marker predefinido 1", "Leve", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude() + 0.001d, location.getLongitude()));
-                        addDefaultMarker("Obras", "Marker predefinido 2", "Moderado", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude(), location.getLongitude() + 0.001d));
-                        addDefaultMarker("Zona Peatonal", "Marker predefinido 3", "Grave", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude() + 0.002d, location.getLongitude()));
-                        addDefaultMarker("Obras", "Marker predefinido 4", "Leve", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude(), location.getLongitude() + 0.002d));
-                        addDefaultMarker("Visibilidad", "Marker predefinido 5", "Moderado", new User("test@test.com", "Sistem", "1234"), new LatLng(location.getLatitude() + 0.002d, location.getLongitude() + 0.002d));
-
                         String zoomString = preferences.getString("defaultZoomMap", "16");
                         int zoom = Integer.parseInt(zoomString);
 
@@ -271,39 +273,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    public void addDefaultMarker(String type, String description, String level, User author, LatLng latLng) {
-
-        InfoMarker infoMarker = new InfoMarker();
-        infoMarker.setType(type);
-        infoMarker.setDescription(description);
-        infoMarker.setLevel(level);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm");
-        infoMarker.setDate(sdf.format(new Date()));
-
-        //3º Entrega: Obtener de BBDD
-        infoMarker.setAuthor(author);
-
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-
-        switch (infoMarker.getLevel()) {
-            case "Leve":
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                break;
-            case "Moderado":
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-                break;
-            case "Grave":
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                break;
-        }
-
-        Marker marker = map.addMarker(markerOptions);
-        marker.setTag(infoMarker);
-        markers.add(marker);
-    }
-
     public void addPersonalizedMarker(final LatLng latLng) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -321,9 +290,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm");
                 infoMarker.setDate(sdf.format(new Date()));
-
-                //3º Entrega: Obtener de BBDD
-                infoMarker.setAuthor(new User("admin@admin.es", "admin", "admin"));
+                infoMarker.setAuthor(currentUser.getDisplayName());
 
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
@@ -343,6 +310,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Marker marker = map.addMarker(markerOptions);
                 marker.setTag(infoMarker);
                 markers.add(marker);
+
+                firebaseFirestore.collection("Markers").add(marker).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(MapActivity.this, "Marker guardado correctamente", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MapActivity.this, "Error al guardar el marker", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
             }
         }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
@@ -359,7 +338,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 InfoMarker infoMarker = (InfoMarker) marker.getTag();
                 if ((infoMarker.getType().equals(type) || type.equals("Todos"))
                         && (infoMarker.getLevel().equals(level) || level.equals("Todos"))
-                        && (infoMarker.getAuthor().getUser().equals(author) || author.isEmpty())) {
+                        && (infoMarker.getAuthor().equals(author) || author.isEmpty())) {
                             marker.setVisible(true);
                 }
                 else {
@@ -415,6 +394,51 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 wifiManager.setWifiEnabled(false);
             }
         }
+
+        if(key.equals("changePassword")) {
+            String newPasword = sharedPreferences.getString("changePassword", "0");
+            currentUser.updatePassword(newPasword).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+
+                    if(task.isSuccessful()) {
+                        Toast.makeText(MapActivity.this, "Contraseña modificada", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        FirebaseAuthException exception = (FirebaseAuthException) task.getException();
+                        String errorCode = exception.getErrorCode();
+
+                        switch (errorCode) {
+                            case "ERROR_WEAK_PASSWORD":
+                                Toast.makeText(MapActivity.this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+                            default:
+                                Toast.makeText(MapActivity.this, errorCode, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            });
+        }
+
+        if (key.equals("changeAlias")) {
+            String newAlias = sharedPreferences.getString("changeAlias", "");
+            if(newAlias.isEmpty()) {
+                Toast.makeText(this, "El alias no puede estar vacio", Toast.LENGTH_SHORT).show();
+            } else {
+                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(newAlias).build();
+                currentUser.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(MapActivity.this, "Alias modificado", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(MapActivity.this, "Error al modificar el alias", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }
+
     }
 
     //Custom Info Window for the markers
@@ -441,7 +465,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             ((TextView)v.findViewById(R.id.info_window_level)).setText("Nivel:  " + infoMarker.getLevel());
             ((TextView)v.findViewById(R.id.info_window_description)).setText("Descripción: " + infoMarker.getDescription());
             ((TextView)v.findViewById(R.id.info_window_date)).setText("Fecha: " + infoMarker.getDate().toString());
-            ((TextView)v.findViewById(R.id.info_window_author)).setText("Creado por: " + infoMarker.getAuthor().getUser());
+            ((TextView)v.findViewById(R.id.info_window_author)).setText("Creado por: " + infoMarker.getAuthor());
 
             return v;
         }

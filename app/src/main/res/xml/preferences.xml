@@ -7,6 +7,12 @@
             android:summary="Modifica la contraseña de tu cuenta"
             android:dialogTitle="Nueva contraseña"/>
 
+        <EditTextPreference
+            android:key="changeAlias"
+            android:title="Cambiar alias"
+            android:summary="Modifique su nombre publico"
+            android:dialogTitle="Nuevo alias"/>
+
         <PreferenceScreen
             android:title="Subscripcion Premium"
             android:summary="Adquiere la version Premium para disfrutar de multiples ventajas">
