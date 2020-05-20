@@ -47,8 +47,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -242,15 +245,37 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         goToMyCurrentLocation(zoom);
                         showCurrentLocation = true;
                     }
+                    updateAvaliableInfoMarkers();
                 }
             }
         };
     }
 
+    public void updateAvaliableInfoMarkers() {
+
+        CollectionReference collectionReference = firebaseFirestore.collection("Markers");
+        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document: task.getResult()) {
+                        InfoMarker infoMarker = document.toObject(InfoMarker.class);
+                        if(calculeVisibilityMarker(infoMarker.getLatitude(), infoMarker.getLongitude())) {
+                            showPersonalizedMarker(infoMarker);
+                        }
+                    }
+                }
+                else {
+                    Toast.makeText(MapActivity.this, "Error al obtener los marcadores", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     private void createLocationRequest() {
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(100000);
-        locationRequest.setFastestInterval(50000);
+        locationRequest.setInterval(15000);
+        locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -291,6 +316,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm");
                 infoMarker.setDate(sdf.format(new Date()));
                 infoMarker.setAuthor(currentUser.getDisplayName());
+                infoMarker.setLatitude(latLng.latitude);
+                infoMarker.setLongitude(latLng.longitude);
 
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
@@ -311,7 +338,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 marker.setTag(infoMarker);
                 markers.add(marker);
 
-                firebaseFirestore.collection("Markers").add(marker).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                firebaseFirestore.collection("Markers").add(infoMarker).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
@@ -330,6 +357,40 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
         builder.create().show();
+    }
+
+    public boolean calculeVisibilityMarker(double latitude, double longitude) {
+        double MAX_LATITUDE = location.getLatitude() + 0.002;
+        double MIN_LATITUDE = location.getLatitude() - 0.002;
+        double MAX_LONGITUDE = location.getLongitude() + 0.002;
+        double MIN_LONGITUDE = location.getLongitude() - 0.002;
+
+        return (latitude <= MAX_LATITUDE)
+                && (longitude <= MAX_LONGITUDE)
+                && (latitude >= MIN_LATITUDE)
+                && (longitude >= MIN_LONGITUDE);
+    }
+
+    public void showPersonalizedMarker(InfoMarker infoMarker) {
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(new LatLng(infoMarker.getLatitude(), infoMarker.getLongitude()));
+
+        switch (infoMarker.getLevel()) {
+            case "Leve":
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                break;
+            case "Moderado":
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                break;
+            case "Grave":
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                break;
+        }
+
+        Marker marker = map.addMarker(markerOptions);
+        marker.setTag(infoMarker);
+        markers.add(marker);
     }
 
     public void filterResults(String type, String level, String author) {

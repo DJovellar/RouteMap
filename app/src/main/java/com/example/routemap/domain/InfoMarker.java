@@ -7,6 +7,8 @@ public class InfoMarker {
     private String level;
     private String date;
     private String author;
+    private double latitude;
+    private double longitude;
 
     public InfoMarker() {  }
 
@@ -56,5 +58,21 @@ public class InfoMarker {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }
