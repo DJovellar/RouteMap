@@ -1,18 +1,20 @@
 package com.example.routemap.domain;
 
+import java.util.Date;
+
 public class InfoMarker {
 
     private String type;
     private String description;
     private String level;
-    private String date;
+    private Date date;
     private String author;
     private double latitude;
     private double longitude;
 
     public InfoMarker() {  }
 
-    public InfoMarker(String type, String description, String level, String date, String author) {
+    public InfoMarker(String type, String description, String level, Date date, String author) {
         this.type = type;
         this.description = description;
         this.level = level;
@@ -44,11 +46,11 @@ public class InfoMarker {
         this.level = level;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

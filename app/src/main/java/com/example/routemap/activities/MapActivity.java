@@ -54,7 +54,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -253,14 +255,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     public void updateAvaliableInfoMarkers() {
 
+        String days_string = preferences.getString("daysMarkers", "1");
+        int days = Integer.parseInt(days_string);
+
+        Date currentDate = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(currentDate);
+        c.add(Calendar.DATE, -days);
+        currentDate = c.getTime();
+
         CollectionReference collectionReference = firebaseFirestore.collection("Markers");
-        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        collectionReference.whereGreaterThanOrEqualTo("date", currentDate).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document: task.getResult()) {
                         InfoMarker infoMarker = document.toObject(InfoMarker.class);
-                        if(calculeVisibilityMarker(infoMarker.getLatitude(), infoMarker.getLongitude())) {
+                        if(calculVisibilityMarker(infoMarker.getLatitude(), infoMarker.getLongitude())) {
                             showPersonalizedMarker(infoMarker);
                         }
                     }
@@ -313,8 +324,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 infoMarker.setDescription(((TextView) v1.findViewById(R.id.input_info_description)).getText().toString());
                 infoMarker.setLevel(((Spinner) v1.findViewById(R.id.input_info_level)).getSelectedItem().toString());
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm");
-                infoMarker.setDate(sdf.format(new Date()));
+                Date currentDate = new Date();
+                infoMarker.setDate(currentDate);
                 infoMarker.setAuthor(currentUser.getDisplayName());
                 infoMarker.setLatitude(latLng.latitude);
                 infoMarker.setLongitude(latLng.longitude);
@@ -359,7 +370,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         builder.create().show();
     }
 
-    public boolean calculeVisibilityMarker(double latitude, double longitude) {
+    public boolean calculVisibilityMarker(double latitude, double longitude) {
         double MAX_LATITUDE = location.getLatitude() + 0.002;
         double MIN_LATITUDE = location.getLatitude() - 0.002;
         double MAX_LONGITUDE = location.getLongitude() + 0.002;
@@ -499,7 +510,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 });
             }
         }
-
     }
 
     //Custom Info Window for the markers
@@ -518,6 +528,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         @Override
         public View getInfoContents(Marker marker) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm");
+
             View v = inflater.inflate(R.layout.info_window_marker, null);
 
             //Details of the marker
@@ -525,7 +537,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             ((TextView)v.findViewById(R.id.info_window_type)).setText("Tipo: " + infoMarker.getType());
             ((TextView)v.findViewById(R.id.info_window_level)).setText("Nivel:  " + infoMarker.getLevel());
             ((TextView)v.findViewById(R.id.info_window_description)).setText("Descripción: " + infoMarker.getDescription());
-            ((TextView)v.findViewById(R.id.info_window_date)).setText("Fecha: " + infoMarker.getDate().toString());
+            ((TextView)v.findViewById(R.id.info_window_date)).setText("Fecha: " + sdf.format(infoMarker.getDate()));
             ((TextView)v.findViewById(R.id.info_window_author)).setText("Creado por: " + infoMarker.getAuthor());
 
             return v;
