@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.routemap.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -103,7 +104,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         }
                                     }
                                 }
-                            });
+                            }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(LoginActivity.this, "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
                     Toast.makeText(this, "Acepte los permisos para acceder a la aplicación", Toast.LENGTH_LONG).show();
                 }
