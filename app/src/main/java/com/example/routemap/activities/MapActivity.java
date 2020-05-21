@@ -44,7 +44,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -68,13 +67,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -350,8 +347,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         InfoMarker infoMarker = document.toObject(InfoMarker.class);
 
                         if(!documentsId.contains(document.getId())) {
-                            documentsId.add(document.getId());
                             if(calculVisibilityMarker(infoMarker.getLatitude(), infoMarker.getLongitude())) {
+                                documentsId.add(document.getId());
                                 showPersonalizedMarker(infoMarker);
                             }
                         }
