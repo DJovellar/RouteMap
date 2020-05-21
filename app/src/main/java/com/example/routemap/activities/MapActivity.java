@@ -12,8 +12,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.routemap.R;
+import com.example.routemap.domain.DirectionsParser;
 import com.example.routemap.domain.InfoMarker;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -41,6 +44,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,12 +58,23 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapClickListener, OnMarkerClickListener, OnInfoWindowClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -69,6 +85,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private View v2;
 
     private List<Marker> markers;
+    private List<String> documentsId;
 
     private SharedPreferences preferences;
     private WifiManager wifiManager;
@@ -79,6 +96,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     private boolean showCurrentLocation = false;
+    private boolean markerRoute = false;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseUser currentUser;
@@ -105,11 +123,57 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         createLocationRequest();
 
         markers = new ArrayList<>();
+        documentsId = new ArrayList<>();
 
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
 
         firebaseFirestore = FirebaseFirestore.getInstance();
+
+    }
+
+    public void calculateRoute(double destination_latitude, double destination_longitude) {
+        String url=
+                "https://maps.googleapis.com/maps/api/directions/json?origin="
+                        + location.getLatitude() + "," + location.getLongitude() +"&destination="
+                        + destination_latitude + "," + destination_longitude + "&sensor=false" + "&alternatives=true" + "&key=" + getString(R.string.google_api_key);
+
+        TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+        taskRequestDirections.execute(url);
+    }
+
+    private String requestDirection(String reqUrl) throws IOException {
+        String responseString = "";
+        InputStream inputStream = null;
+        HttpURLConnection httpURLConnection = null;
+        try {
+            URL url = new URL(reqUrl);
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.connect();
+
+            //Get the response result
+            inputStream = httpURLConnection.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            StringBuffer stringBuffer = new StringBuffer();
+            String line = "";
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuffer.append(line);
+            }
+
+            responseString = stringBuffer.toString();
+            bufferedReader.close();
+            inputStreamReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            httpURLConnection.disconnect();
+        }
+        return responseString;
     }
 
     @Override
@@ -172,6 +236,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 builder.create().show();
                 return true;
 
+            case R.id.routeButton:
+                markerRoute = true;
+                Toast.makeText(this, "Seleccione el destino en el mapa", Toast.LENGTH_SHORT).show();
+                return true;
+
             case R.id.settingsButton:
                 Intent in = new Intent(this, PreferencesActivity.class);
                 startActivity(in);
@@ -218,11 +287,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.setOnMarkerClickListener(this);
         map.setOnInfoWindowClickListener(this);
         preferences.registerOnSharedPreferenceChangeListener(this);
+
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
-        addPersonalizedMarker(latLng);
+
+        if(markerRoute) {
+            calculateRoute(latLng.latitude, latLng.longitude);
+            addDestinationMarker(latLng);
+            markerRoute = false;
+        } else {
+            addPersonalizedMarker(latLng);
+        }
     }
 
     private void startLocationUpdates() {
@@ -264,15 +341,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         c.add(Calendar.DATE, -days);
         currentDate = c.getTime();
 
-        CollectionReference collectionReference = firebaseFirestore.collection("Markers");
+        final CollectionReference collectionReference = firebaseFirestore.collection("Markers");
         collectionReference.whereGreaterThanOrEqualTo("date", currentDate).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document: task.getResult()) {
                         InfoMarker infoMarker = document.toObject(InfoMarker.class);
-                        if(calculVisibilityMarker(infoMarker.getLatitude(), infoMarker.getLongitude())) {
-                            showPersonalizedMarker(infoMarker);
+
+                        if(!documentsId.contains(document.getId())) {
+                            documentsId.add(document.getId());
+                            if(calculVisibilityMarker(infoMarker.getLatitude(), infoMarker.getLongitude())) {
+                                showPersonalizedMarker(infoMarker);
+                            }
                         }
                     }
                 }
@@ -353,9 +434,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(MapActivity.this, "Marker guardado correctamente", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MapActivity.this, "Marcador compartido correctamente", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(MapActivity.this, "Error al guardar el marker", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MapActivity.this, "Error al compartir el marcador", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -370,11 +451,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         builder.create().show();
     }
 
+    public void addDestinationMarker(final LatLng latLng) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+        map.addMarker(markerOptions);
+    }
+
     public boolean calculVisibilityMarker(double latitude, double longitude) {
-        double MAX_LATITUDE = location.getLatitude() + 0.002;
-        double MIN_LATITUDE = location.getLatitude() - 0.002;
-        double MAX_LONGITUDE = location.getLongitude() + 0.002;
-        double MIN_LONGITUDE = location.getLongitude() - 0.002;
+        double MAX_LATITUDE = location.getLatitude() + 0.01;
+        double MIN_LATITUDE = location.getLatitude() - 0.01;
+        double MAX_LONGITUDE = location.getLongitude() + 0.01;
+        double MIN_LONGITUDE = location.getLongitude() - 0.01;
 
         return (latitude <= MAX_LATITUDE)
                 && (longitude <= MAX_LONGITUDE)
@@ -422,7 +510,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        marker.showInfoWindow();
+
+        if(marker.getTag() != null) {
+            marker.showInfoWindow();
+        }
         return true;
     }
 
@@ -528,6 +619,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         @Override
         public View getInfoContents(Marker marker) {
+
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm");
 
             View v = inflater.inflate(R.layout.info_window_marker, null);
@@ -543,4 +635,75 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             return v;
         }
     }
+
+    public class TaskRequestDirections extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String responseString = "";
+            try {
+                responseString = requestDirection(strings[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return responseString;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            //Parse JSON here
+            TaskParser taskParser = new TaskParser();
+            taskParser.execute(s);
+        }
+    }
+
+    public class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
+
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... strings) {
+            JSONObject jsonObject = null;
+            List<List<HashMap<String, String>>> routes = null;
+            try {
+                jsonObject = new JSONObject(strings[0]);
+                DirectionsParser directionsParser = new DirectionsParser();
+                routes = directionsParser.parse(jsonObject);
+            }catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> lists) {
+            // Get list route and display it into the map
+
+            ArrayList points = null;
+            PolylineOptions polylineOptions = null;
+
+            for (List<HashMap<String, String>> path: lists) {
+                points = new ArrayList();
+                polylineOptions = new PolylineOptions();
+
+                for (HashMap<String, String> point : path) {
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lon = Double.parseDouble(point.get("lon"));
+
+                    points.add(new LatLng(lat, lon));
+                }
+
+                polylineOptions.addAll(points);
+                polylineOptions.width(8);
+                polylineOptions.color(Color.CYAN);
+                polylineOptions.geodesic(true);
+
+                map.addPolyline(polylineOptions);
+            }
+            if(polylineOptions == null) {
+                Toast.makeText(MapActivity.this, "Error al calcular la ruta, intentelo de nuevo", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
+
