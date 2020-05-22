@@ -7,13 +7,27 @@
             android:summary="Modifica la contraseña de tu cuenta"
             android:dialogTitle="Nueva contraseña"/>
 
-        <PreferenceScreen
+        <EditTextPreference
+            android:key="changeAlias"
+            android:title="Cambiar alias"
+            android:summary="Modifique su nombre publico"
+            android:dialogTitle="Nuevo alias"/>
+
+        <ListPreference
+            android:key="subscriptionPremium"
             android:title="Subscripcion Premium"
-            android:summary="Adquiere la version Premium para disfrutar de multiples ventajas">
+            android:summary="Adquiera la version premium para disfrutar de multiples ventajas"
+            android:entries="@array/subscriptionSpinnerType"
+            android:entryValues="@array/subscriptionSpinnerType"
+            android:defaultValue="Desactivada"/>
 
-            <!-- 3ª Entrega: Falta intent a nueva activity -->
-
-        </PreferenceScreen>
+        <ListPreference
+            android:key="networkType"
+            android:title="Configuracion de red"
+            android:summary="Elige el modo de conexion deseado"
+            android:entries="@array/networkSpinnerType"
+            android:entryValues="@array/networkSpinnerType"
+            android:defaultValue="Wifi" />
 
     </PreferenceCategory>
 
@@ -23,7 +37,6 @@
             android:title="Tipo de mapa"
             android:summary="Elige el tipo de mapa por defecto"
             android:entries="@array/defaultTypeMap"
-            android:icon="@android:drawable/ic_menu_mapmode"
             android:entryValues="@array/defaultTypeMap"
             android:defaultValue="Normal" />
 
@@ -33,23 +46,13 @@
             android:summary="Define el zoom por defecto al cargar el mapa"
             android:defaultValue="14"/>
 
-    </PreferenceCategory>
+        <ListPreference
+            android:key="daysMarkers"
+            android:title="Fecha de los marcadores"
+            android:summary="Elija la fecha de antiguedad maxima de los marcadores"
+            android:entries="@array/daysMarkersSpinner"
+            android:entryValues="@array/daysMarkersSpinner"
+            android:defaultValue="1" />
 
-    <PreferenceCategory android:title="INFORMACIÓN">
-        <PreferenceScreen
-            android:title="Manual de uso"
-            android:summary="Aprende a utilizar correctamente la aplicación">
-
-            <!-- 3ª Entrega: Falta intent a nueva activity -->
-
-        </PreferenceScreen>
-
-        <PreferenceScreen
-            android:title="Acerca de mi"
-            android:summary="Conoce mas sobre el creador de la aplicación">
-
-            <!-- 3ª Entrega: Falta intent a nueva activity -->
-
-        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>
