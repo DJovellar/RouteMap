@@ -9,6 +9,7 @@
 
     <!-- Register layout -->
     <string name="email">Email</string>
+    <string name="alias">Alias</string>
     <string name="password2">Confirmar contraseña</string>
     <string name="enviar">Confirmar</string>
 
@@ -69,6 +70,11 @@
     <string-array name="networkSpinnerType">
         <item>Wifi</item>
         <item>Datos</item>
+    </string-array>
+
+    <string-array name="subscriptionSpinnerType">
+        <item>Desactivada</item>
+        <item>Activada</item>
     </string-array>
 
 </resources>

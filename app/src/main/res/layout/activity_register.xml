@@ -48,11 +48,11 @@
         </EditText>
 
         <EditText
-            android:id="@+id/registerUser"
+            android:id="@+id/registerAlias"
             android:layout_width="250dp"
             android:layout_height="40dp"
             android:layout_gravity="center_horizontal"
-            android:hint="@string/user"
+            android:hint="@string/alias"
             android:layout_marginTop="38dp"
             android:textAlignment="center"
             android:ems="10"
