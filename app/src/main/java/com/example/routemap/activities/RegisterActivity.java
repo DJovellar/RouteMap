@@ -78,37 +78,36 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                         startActivity(in);
                                     }
                                     else {
-                                        FirebaseAuthException exception = (FirebaseAuthException) task.getException();
-                                        String errorCode = exception.getErrorCode();
+                                        try {
+                                            FirebaseAuthException exception = (FirebaseAuthException) task.getException();
+                                            String errorCode = exception.getErrorCode();
 
-                                        switch (errorCode) {
-                                            case "ERROR_INVALID_EMAIL":
-                                                Toast.makeText(RegisterActivity.this, "El formato del email no es valido", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(email, null,null, null);
-                                                email.requestFocus();
-                                                break;
-                                            case "ERROR_EMAIL_ALREADY_IN_USE":
-                                                Toast.makeText(RegisterActivity.this, "El email ya esta registrado", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(email, null,null, null);
-                                                email.requestFocus();
-                                                break;
-                                            case "ERROR_WEAK_PASSWORD":
-                                                Toast.makeText(RegisterActivity.this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(null, null, password, password2);
-                                                password.requestFocus();
-                                                break;
-                                            default:
-                                                Toast.makeText(RegisterActivity.this, "Error por causa desconocida, escriba a Soporte para mas información", Toast.LENGTH_SHORT).show();
-                                                email.requestFocus();
+                                            switch (errorCode) {
+                                                case "ERROR_INVALID_EMAIL":
+                                                    Toast.makeText(RegisterActivity.this, "El formato del email no es valido", Toast.LENGTH_SHORT).show();
+                                                    showBorderErrors(email, null,null, null);
+                                                    email.requestFocus();
+                                                    break;
+                                                case "ERROR_EMAIL_ALREADY_IN_USE":
+                                                    Toast.makeText(RegisterActivity.this, "El email ya esta registrado", Toast.LENGTH_SHORT).show();
+                                                    showBorderErrors(email, null,null, null);
+                                                    email.requestFocus();
+                                                    break;
+                                                case "ERROR_WEAK_PASSWORD":
+                                                    Toast.makeText(RegisterActivity.this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+                                                    showBorderErrors(null, null, password, password2);
+                                                    password.requestFocus();
+                                                    break;
+                                                default:
+                                                    Toast.makeText(RegisterActivity.this, "Error por causa desconocida, escriba a Soporte para mas información", Toast.LENGTH_SHORT).show();
+                                                    email.requestFocus();
+                                            }
+                                        } catch (ClassCastException e) {
+                                            Toast.makeText(RegisterActivity.this, "No hay conexion a Internet", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
-                            }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(RegisterActivity.this, "No hay conexion a Internet", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                            });
                 } else {
                     Toast.makeText(this, "Acepte los permisos para registrarse en la aplicación", Toast.LENGTH_LONG).show();
                 }
