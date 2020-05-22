@@ -18,6 +18,7 @@ import com.example.routemap.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -74,42 +75,41 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         startActivity(in);
                                     }
                                     else {
-                                        FirebaseAuthException exception = (FirebaseAuthException) task.getException();
-                                        String errorCode = exception.getErrorCode();
+                                        try {
+                                            FirebaseAuthException exception = (FirebaseAuthException) task.getException();
+                                            String errorCode = exception.getErrorCode();
 
-                                        switch (errorCode) {
-                                            case "ERROR_INVALID_EMAIL":
-                                                Toast.makeText(LoginActivity.this, "El formato del email no es valido", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(user, null);
-                                                user.requestFocus();
-                                                break;
-                                            case "ERROR_USER_NOT_FOUND":
-                                                Toast.makeText(LoginActivity.this, "El email no esta registrado", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(user, null);
-                                                user.requestFocus();
-                                                break;
-                                            case "ERROR_WRONG_PASSWORD":
-                                                Toast.makeText(LoginActivity.this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(null, password);
-                                                password.requestFocus();
-                                                break;
-                                            case "ERROR_USER_DISABLED":
-                                                Toast.makeText(LoginActivity.this, "Usuario deshabilitado, contacte con Soporte", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(user, password);
-                                                user.requestFocus();
-                                            default:
-                                                Toast.makeText(LoginActivity.this, "Error por causa desconocida, escriba a Soporte para mas información", Toast.LENGTH_SHORT).show();
-                                                showBorderErrors(user, password);
-                                                user.requestFocus();
+                                            switch (errorCode) {
+                                                case "ERROR_INVALID_EMAIL":
+                                                    Toast.makeText(LoginActivity.this, "El formato del email no es valido", Toast.LENGTH_SHORT).show();
+                                                    showBorderErrors(user, null);
+                                                    user.requestFocus();
+                                                    break;
+                                                case "ERROR_USER_NOT_FOUND":
+                                                    Toast.makeText(LoginActivity.this, "El email no esta registrado", Toast.LENGTH_SHORT).show();
+                                                    showBorderErrors(user, null);
+                                                    user.requestFocus();
+                                                    break;
+                                                case "ERROR_WRONG_PASSWORD":
+                                                    Toast.makeText(LoginActivity.this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show();
+                                                    showBorderErrors(null, password);
+                                                    password.requestFocus();
+                                                    break;
+                                                case "ERROR_USER_DISABLED":
+                                                    Toast.makeText(LoginActivity.this, "Usuario deshabilitado, contacte con Soporte", Toast.LENGTH_SHORT).show();
+                                                    showBorderErrors(user, password);
+                                                    user.requestFocus();
+                                                default:
+                                                    Toast.makeText(LoginActivity.this, "Error por causa desconocida, escriba a Soporte para mas información", Toast.LENGTH_SHORT).show();
+                                                    showBorderErrors(user, password);
+                                                    user.requestFocus();
+                                            }
+                                        } catch (ClassCastException e) {
+                                            Toast.makeText(LoginActivity.this, "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
-                            }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(LoginActivity.this, "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                            });
                 } else {
                     Toast.makeText(this, "Acepte los permisos para acceder a la aplicación", Toast.LENGTH_LONG).show();
                 }
