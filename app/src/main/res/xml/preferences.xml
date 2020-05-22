@@ -46,11 +46,13 @@
             android:summary="Define el zoom por defecto al cargar el mapa"
             android:defaultValue="14"/>
 
-        <EditTextPreference
+        <ListPreference
             android:key="daysMarkers"
             android:title="Fecha de los marcadores"
             android:summary="Elija la fecha de antiguedad maxima de los marcadores"
-            android:defaultValue="1"/>
+            android:entries="@array/daysMarkersSpinner"
+            android:entryValues="@array/daysMarkersSpinner"
+            android:defaultValue="1" />
 
     </PreferenceCategory>
 </PreferenceScreen>
