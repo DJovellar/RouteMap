@@ -94,6 +94,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private boolean showCurrentLocation = false;
     private boolean markerRoute = false;
+    private boolean activatedPlan = false;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseUser currentUser;
@@ -129,50 +130,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    public void calculateRoute(double destination_latitude, double destination_longitude) {
-        String url=
-                "https://maps.googleapis.com/maps/api/directions/json?origin="
-                        + location.getLatitude() + "," + location.getLongitude() +"&destination="
-                        + destination_latitude + "," + destination_longitude + "&sensor=false" + "&alternatives=true" + "&key=" + getString(R.string.google_api_key);
-
-        TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
-        taskRequestDirections.execute(url);
-    }
-
-    private String requestDirection(String reqUrl) throws IOException {
-        String responseString = "";
-        InputStream inputStream = null;
-        HttpURLConnection httpURLConnection = null;
-        try {
-            URL url = new URL(reqUrl);
-            httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.connect();
-
-            //Get the response result
-            inputStream = httpURLConnection.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-            StringBuffer stringBuffer = new StringBuffer();
-            String line = "";
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuffer.append(line);
-            }
-
-            responseString = stringBuffer.toString();
-            bufferedReader.close();
-            inputStreamReader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-            httpURLConnection.disconnect();
-        }
-        return responseString;
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -189,6 +146,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             wifiManager.setWifiEnabled(false);
         }
         showCurrentLocation = false;
+
+        String plan = preferences.getString("subscriptionPremium", "Desactivada");
+        if(plan.equals("Desactivada")) {
+            activatedPlan = false;
+        } else {
+            activatedPlan = true;
+        }
     }
 
     @Override
@@ -287,18 +251,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    @Override
-    public void onMapClick(LatLng latLng) {
-
-        if(markerRoute) {
-            calculateRoute(latLng.latitude, latLng.longitude);
-            addDestinationMarker(latLng);
-            markerRoute = false;
-        } else {
-            addPersonalizedMarker(latLng);
-        }
-    }
-
     private void startLocationUpdates() {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
     }
@@ -327,40 +279,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         };
     }
 
-    public void updateAvaliableInfoMarkers() {
-
-        String days_string = preferences.getString("daysMarkers", "1");
-        int days = Integer.parseInt(days_string);
-
-        Date currentDate = new Date();
-        Calendar c = Calendar.getInstance();
-        c.setTime(currentDate);
-        c.add(Calendar.DATE, -days);
-        currentDate = c.getTime();
-
-        final CollectionReference collectionReference = firebaseFirestore.collection("Markers");
-        collectionReference.whereGreaterThanOrEqualTo("date", currentDate).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document: task.getResult()) {
-                        InfoMarker infoMarker = document.toObject(InfoMarker.class);
-
-                        if(!documentsId.contains(document.getId())) {
-                            if(calculVisibilityMarker(infoMarker.getLatitude(), infoMarker.getLongitude())) {
-                                documentsId.add(document.getId());
-                                showPersonalizedMarker(infoMarker);
-                            }
-                        }
-                    }
-                }
-                else {
-                    Toast.makeText(MapActivity.this, "Error al obtener los marcadores", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
     private void createLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(15000);
@@ -384,6 +302,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         else {
             Toast.makeText(this, "Falta permiso para obtener la localización", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+        if(markerRoute) {
+            calculateRoute(latLng.latitude, latLng.longitude);
+            addDestinationMarker(latLng);
+            markerRoute = false;
+        } else {
+            addPersonalizedMarker(latLng);
         }
     }
 
@@ -455,16 +385,60 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.addMarker(markerOptions);
     }
 
-    public boolean calculVisibilityMarker(double latitude, double longitude) {
-        double MAX_LATITUDE = location.getLatitude() + 0.01;
-        double MIN_LATITUDE = location.getLatitude() - 0.01;
-        double MAX_LONGITUDE = location.getLongitude() + 0.01;
-        double MIN_LONGITUDE = location.getLongitude() - 0.01;
+    public void updateAvaliableInfoMarkers() {
 
-        return (latitude <= MAX_LATITUDE)
-                && (longitude <= MAX_LONGITUDE)
-                && (latitude >= MIN_LATITUDE)
-                && (longitude >= MIN_LONGITUDE);
+        String days_string = preferences.getString("daysMarkers", "1");
+        int days = Integer.parseInt(days_string);
+
+        Date currentDate = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(currentDate);
+        c.add(Calendar.DATE, -days);
+        currentDate = c.getTime();
+
+        final CollectionReference collectionReference = firebaseFirestore.collection("Markers");
+        collectionReference.whereGreaterThanOrEqualTo("date", currentDate).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document: task.getResult()) {
+                        InfoMarker infoMarker = document.toObject(InfoMarker.class);
+
+                        if(!documentsId.contains(document.getId())) {
+                            if(calculVisibilityMarker(infoMarker.getLatitude(), infoMarker.getLongitude())) {
+                                documentsId.add(document.getId());
+                                showPersonalizedMarker(infoMarker);
+                            }
+                        }
+                    }
+                }
+                else {
+                    Toast.makeText(MapActivity.this, "Error al obtener los marcadores", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    public boolean calculVisibilityMarker(double latitude, double longitude) {
+
+        double MAX_LATITUDE;
+        double MIN_LATITUDE;
+        double MAX_LONGITUDE;
+        double MIN_LONGITUDE;
+
+        if(activatedPlan) {
+            return true;
+        } else {
+            MAX_LATITUDE = location.getLatitude() + 0.01;
+            MIN_LATITUDE = location.getLatitude() - 0.01;
+            MAX_LONGITUDE = location.getLongitude() + 0.01;
+            MIN_LONGITUDE = location.getLongitude() - 0.01;
+
+            return (latitude <= MAX_LATITUDE)
+                    && (longitude <= MAX_LONGITUDE)
+                    && (latitude >= MIN_LATITUDE)
+                    && (longitude >= MIN_LONGITUDE);
+        }
     }
 
     public void showPersonalizedMarker(InfoMarker infoMarker) {
@@ -507,7 +481,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-
         if(marker.getTag() != null) {
             marker.showInfoWindow();
         }
@@ -598,9 +571,63 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 });
             }
         }
+
+        if(key.equals("subscriptionPremium")) {
+            String plan = sharedPreferences.getString("subscriptionPremium", "Desactivada");
+
+            if(plan.equals("Desactivada")) {
+                activatedPlan = false;
+            } else {
+                activatedPlan = true;
+            }
+        }
+
     }
 
-    //Custom Info Window for the markers
+    public void calculateRoute(double destination_latitude, double destination_longitude) {
+        String url=
+                "https://maps.googleapis.com/maps/api/directions/json?origin="
+                        + location.getLatitude() + "," + location.getLongitude() +"&destination="
+                        + destination_latitude + "," + destination_longitude + "&sensor=false" + "&alternatives=true" + "&key=" + getString(R.string.google_api_key);
+
+        TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+        taskRequestDirections.execute(url);
+    }
+
+    private String requestDirection(String reqUrl) throws IOException {
+        String responseString = "";
+        InputStream inputStream = null;
+        HttpURLConnection httpURLConnection = null;
+        try {
+            URL url = new URL(reqUrl);
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.connect();
+
+            //Get the response result
+            inputStream = httpURLConnection.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            StringBuffer stringBuffer = new StringBuffer();
+            String line = "";
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuffer.append(line);
+            }
+
+            responseString = stringBuffer.toString();
+            bufferedReader.close();
+            inputStreamReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            httpURLConnection.disconnect();
+        }
+        return responseString;
+    }
+
     public static class CustomInfoWindowAdapter implements InfoWindowAdapter {
 
         private LayoutInflater inflater;
